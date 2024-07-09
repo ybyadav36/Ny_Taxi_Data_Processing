@@ -1,0 +1,6 @@
+pandas 
+requests 
+pyarrow
+fastparquet
+tqdm
+bs4

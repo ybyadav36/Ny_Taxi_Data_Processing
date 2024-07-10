@@ -1,1 +1,13 @@
+*.pyc
+__pycache__/
 env/
+.idea/
+.vscode/
+data/
+
+data/*/yellow/*.csv
+data/*.parquet
+data/*/green/*.csv
+
+# Logs
+*.log

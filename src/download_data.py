@@ -42,9 +42,9 @@ def download_and_convert_to_csv(url, dest_folder, progress_bar, retries=3, timeo
             with http.get(url, stream=True, timeout=timeout) as r: # Added timeout
                 r.raise_for_status()
 
-                # Create in-memory buffer and read parquet (chunk size adjusted)
+                # Create in-memory buffer and read parquet 
                 total_size = int(r.headers.get('content-length', 0))
-                block_size = 1024 * 1024  # 1 MB
+                block_size = 1024 * 1024  
                 buffer = BytesIO()
                 with tqdm(total=total_size, unit='iB', unit_scale=True, desc=f"Downloading {base_filename}", leave=False) as t:
                     for data in r.iter_content(block_size):
@@ -56,7 +56,7 @@ def download_and_convert_to_csv(url, dest_folder, progress_bar, retries=3, timeo
 
             logging.info(f"Downloaded and converted {base_filename} to CSV")
             tqdm.write(f"Downloaded and converted {base_filename} to CSV")
-            progress_bar.update(1)  # Update the progress bar
+            progress_bar.update(1)  # To update the progress bar
             return csv_file
 
         except requests.RequestException as e:
@@ -74,7 +74,7 @@ def download_and_convert_to_csv(url, dest_folder, progress_bar, retries=3, timeo
 def main():
     page_url = "https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page"
     year = "2019"
-    categories = ["yellow", "green"]  # Add more categories as needed
+    categories = ["yellow", "green"]  
     dest_folder = f"data/{year}"
 
     print("Extracting URLs...")
@@ -92,7 +92,7 @@ def main():
     progress_bar = tqdm(total=len(all_urls), desc="Total Progress", unit="file")
 
     # Create ThreadPoolExecutor and download concurrently
-    max_workers = 5  # Reduced max workers to 5 for lower load
+    max_workers = 5  
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {executor.submit(download_and_convert_to_csv, url, folder, progress_bar): url for url, folder in all_urls}
         num_downloaded_files = 0
@@ -101,7 +101,7 @@ def main():
             if result is not None:  
                 num_downloaded_files += 1
 
-    # Check if all files were downloaded
+    # Checks if all files were downloaded
     if num_downloaded_files == len(all_urls):
         print(f"Download completed for all {len(all_urls)} files.")
     else:

@@ -4,10 +4,14 @@ env/
 .idea/
 .vscode/
 data/
-
+processed_data/
 data/*/yellow/*.csv
 data/*.parquet
 data/*/green/*.csv
 
 # Logs
 *.log
+*.db
+.env
+
+

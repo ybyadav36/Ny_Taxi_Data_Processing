@@ -6,3 +6,6 @@ tqdm
 bs4
 beautifulsoup4
 urllib3
+python-dotenv
+seaborn
+matplotlib

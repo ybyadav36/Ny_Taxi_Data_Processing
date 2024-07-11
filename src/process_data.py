@@ -51,6 +51,10 @@ def process_csv_files(category, columns):
                         pickup_col = columns[1]
                         dropoff_col = columns[2]
                         df['trip_duration'] = (df[dropoff_col] - df[pickup_col]).dt.total_seconds() / 3600
+                        df['pickup_hour'] = df[pickup_col].dt.hour
+                        df['day_of_week'] = df[pickup_col].dt.dayofweek
+                        df['month'] = df[pickup_col].dt.month
+                        df['year'] = df[pickup_col].dt.year
 
                         # Calculate average speed and filter out extreme outliers
                         df['average_speed'] = df['trip_distance'] / df['trip_duration']
@@ -61,9 +65,9 @@ def process_csv_files(category, columns):
                         speed_threshold_high = df['average_speed'].quantile(0.99)
                         df = df[(df['average_speed'] >= speed_threshold_low) & (df['average_speed'] <= speed_threshold_high)]
 
-                        # Filter data month-wise and aggregate
+                        # Aggregate data by date and hour
                         df['date'] = df[pickup_col].dt.date
-                        daily_agg = df.groupby('date').agg(
+                        hourly_agg = df.groupby(['date', 'pickup_hour']).agg(
                             total_trips=pd.NamedAgg(column='VendorID', aggfunc='count'),
                             average_fare=pd.NamedAgg(column='fare_amount', aggfunc='mean'),
                             passenger_count=pd.NamedAgg(column='passenger_count', aggfunc='sum'),
@@ -73,10 +77,14 @@ def process_csv_files(category, columns):
                             average_speed=pd.NamedAgg(column='average_speed', aggfunc='mean')
                         ).reset_index()
 
-                        # to Ensure passenger_count is integer
-                        daily_agg['passenger_count'] = daily_agg['passenger_count'].astype(int)
+                        # Ensure passenger_count is integer
+                        hourly_agg['passenger_count'] = hourly_agg['passenger_count'].astype(int)
 
-                        monthly_data.append(daily_agg)
+                        # Round float columns to 2 decimal points
+                        float_cols = ['trip_distance', 'average_fare', 'fare_amount', 'trip_duration', 'average_speed']
+                        hourly_agg[float_cols] = hourly_agg[float_cols].round(2)
+
+                        monthly_data.append(hourly_agg)
 
                     except (FileNotFoundError, pd.errors.EmptyDataError, pd.errors.ParserError) as e:
                         logging.error(f"Error processing {file_path} ({category}): {e}")
@@ -95,6 +103,9 @@ process_csv_files('yellow', yellow_columns)
 
 # Process green taxi data
 process_csv_files('green', green_columns)
+
+
+
 
 
 
